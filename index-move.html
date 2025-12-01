@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>캔버스 사각형 드래그 이동</title>
+  <style>
+    body { font-family: sans-serif; padding: 10px; }
+    #canvas { border: 1px solid #333; }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas" width="600" height="400"></canvas>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  //---- 사각형 정보 ----
+  const rect = {
+    x: 100,
+    y: 100,
+    w: 150,
+    h: 100,
+    color: 'skyblue'
+  };
+  const rect2 = {
+    x: 200,
+    y: 100,
+    w: 150,
+    h: 100,
+    color: 'skyblue'
+  };
+ 
+
+
+  let isDragging = false; // 드래그 중인지 여부
+  let offsetX = 0;        // 클릭한 지점과 사각형 좌측 상단 사이의 거리
+  let offsetY = 0;
+
+  const img2 = new Image();
+  img2.src='2.jpg';
+  img2.onload = function(){
+    ctx.drawImage(img2,rect2.x+200, rect2.y,rect2.w, rect2.h);
+  }
+  const img = new Image();
+  img.src='2.jpg';
+  img.onload = function(){
+    ctx.drawImage(img,rect.x, rect.y,rect.w, rect.h);
+  }
+
+
+  function draw() {
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.drawImage(img,rect.x, rect.y,rect.w, rect.h);
+    ctx.drawImage(img2,rect2.x+200, rect2.y,rect2.w, rect2.h);
+
+
+    ctx.strokeStyle = '#333';
+   
+    ctx.strokeRect(img,rect.x, rect.y, rect.w, rect.h);
+    ctx.strokeRect(img2,rect2.x, rect2.y, rect2.w, rect2.h);
+    console.log(img,rect.x, rect.y, rect.w, rect.h);
+    console.log(img2,rect2.x, rect2.y, rect2.w, rect2.h);
+
+  }
+
+  // 캔버스에 사각형 다시 그리기
+  // function draw() {
+
+
+    // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // ctx.fillStyle = rect.color;
+    // ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+
+    // console.log(rect.x, rect.y, rect.w, rect.h);
+
+    // ctx.strokeStyle = '#333';
+    // ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+  //}
+
+  // 마우스 좌표 → 캔버스 좌표로 변환
+  function getMousePos(e) {
+    const rectCanvas = canvas.getBoundingClientRect();
+    return {
+      x: e.clientX - rectCanvas.left,
+      y: e.clientY - rectCanvas.top
+    };
+  }
+ 
+
+
+
+  // 어떤 점이 사각형 안에 있는지 확인
+  function isInsideRect(x, y) {
+    return (
+      (x >= rect.x &&
+      x <= rect.x + rect.w &&
+      y >= rect.y &&
+      y <= rect.y + rect.h)
+
+      ||( x >= rect2.x &&
+      x <= rect2.x + rect2.w &&
+      y >= rect2.y &&
+      y <= rect2.y + rect2.h )
+    );
+  }
+  
+     
+    
+  
+
+
+ 
+
+
+
+  // ---- 이벤트 등록 ----
+  canvas.addEventListener('mousedown', (e) => {
+    const pos = getMousePos(e);
+    const pos1 = getMousePos(e);
+    if (isInsideRect(pos.x, pos.y)) {
+      isDragging = true;
+
+      // 클릭한 지점 기준으로 offset 저장
+      offsetX = pos.x - rect.x;
+      offsetY = pos.y - rect.y;
+    }
+    if (isInsideRect(pos1.x, pos1.y)) {
+      isDragging = true;
+
+      // 클릭한 지점 기준으로 offset 저장
+      offsetX1 = pos1.x - rect2.x;
+      offsetY1 = pos1.y - rect2.y;
+    }
+  });
+ 
+
+
+
+
+  canvas.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+
+    const pos = getMousePos(e);
+    const pos1 = getMousePos(e);
+
+    // 사각형의 좌표를 마우스 위치 - offset 만큼으로 업데이트
+    rect.x = pos.x - offsetX;
+    rect.y = pos.y - offsetY;
+    rect2.x = pos1.x - offsetX1;
+    rect2.y = pos1.y - offsetY1;
+
+    draw();
+    
+  });
+
+
+
+
+  canvas.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    isDragging = false;
+  });
+
+
+  // 처음 한 번 그리기
+  draw();
+</script>
+
+</body>
+</html>
